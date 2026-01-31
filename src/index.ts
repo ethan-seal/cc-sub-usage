@@ -2,9 +2,10 @@
 
 import { program } from "commander";
 import chalk from "chalk";
+import logUpdate from "log-update";
 import { loadCredentials, isTokenExpired, getTokenExpiresIn } from "./credentials.js";
 import { fetchUsage } from "./api.js";
-import { displayUsage, displayJson } from "./display.js";
+import { formatUsage, formatJson } from "./display.js";
 
 program
   .name("cc-usage")
@@ -69,9 +70,9 @@ async function run(options: Options): Promise<void> {
   const usage = await fetchUsage(oauth.accessToken);
 
   if (options.json) {
-    displayJson(usage);
+    console.log(formatJson(usage));
   } else {
-    displayUsage(usage, oauth);
+    console.log(formatUsage(usage, oauth));
   }
 }
 
@@ -83,21 +84,22 @@ async function watchMode(
 ): Promise<void> {
   const fetch = async () => {
     try {
-      // Clear screen
-      console.clear();
-
+      // Fetch data first (while old content still visible)
       const usage = await fetchUsage(token);
 
+      // Build complete output as a string
+      let output: string;
       if (options.json) {
-        displayJson(usage);
+        output = formatJson(usage);
       } else {
-        displayUsage(usage, oauth as any);
-        console.log(
-          chalk.gray(`Refreshing every ${intervalSeconds}s. Press Ctrl+C to exit.`)
-        );
+        output = formatUsage(usage, oauth as any);
+        output += "\n" + chalk.gray(`Refreshing every ${intervalSeconds}s. Press Ctrl+C to exit.`);
       }
+
+      // Use logUpdate for flicker-free refresh
+      logUpdate(output);
     } catch (error) {
-      console.error(chalk.red("Error:"), (error as Error).message);
+      logUpdate(chalk.red("Error:") + " " + (error as Error).message);
     }
   };
 

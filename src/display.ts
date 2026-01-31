@@ -55,15 +55,17 @@ function formatBucket(
   return `${chalk.cyan(paddedLabel)} ${bar} ${percent}  ${chalk.gray(`resets in ${resetIn}`)}`;
 }
 
-export function displayUsage(usage: UsageResponse, oauth?: OAuth): void {
+export function formatUsage(usage: UsageResponse, oauth?: OAuth): string {
+  const lines: string[] = [];
+
   // Header
   const planType = oauth?.subscriptionType || "unknown";
-  console.log();
-  console.log(
+  lines.push("");
+  lines.push(
     chalk.bold(`Claude Code Usage`) +
       chalk.gray(` (${planType} plan)`)
   );
-  console.log(chalk.gray("━".repeat(50)));
+  lines.push(chalk.gray("━".repeat(50)));
 
   // Main usage buckets
   const buckets: [string, UsageBucket][] = [
@@ -77,32 +79,34 @@ export function displayUsage(usage: UsageResponse, oauth?: OAuth): void {
 
   for (const [label, bucket] of buckets) {
     const line = formatBucket(label, bucket);
-    if (line) console.log(line);
+    if (line) lines.push(line);
   }
 
   // Extra usage (if enabled)
   if (usage.extra_usage.is_enabled) {
-    console.log();
-    console.log(chalk.bold("Extra Usage"));
-    console.log(chalk.gray("─".repeat(50)));
+    lines.push("");
+    lines.push(chalk.bold("Extra Usage"));
+    lines.push(chalk.gray("─".repeat(50)));
 
     const { monthly_limit, used_credits, utilization } = usage.extra_usage;
     if (utilization !== null) {
       const bar = progressBar(utilization);
-      console.log(
+      lines.push(
         `${chalk.cyan("Monthly".padEnd(16))} ${bar} ${Math.round(utilization)}%`
       );
     }
     if (monthly_limit !== null && used_credits !== null) {
-      console.log(
+      lines.push(
         chalk.gray(`  Used: $${(used_credits / 100).toFixed(2)} / $${(monthly_limit / 100).toFixed(2)}`)
       );
     }
   }
 
-  console.log();
+  lines.push("");
+
+  return lines.join("\n");
 }
 
-export function displayJson(usage: UsageResponse): void {
-  console.log(JSON.stringify(usage, null, 2));
+export function formatJson(usage: UsageResponse): string {
+  return JSON.stringify(usage, null, 2);
 }
