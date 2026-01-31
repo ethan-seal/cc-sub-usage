@@ -2,6 +2,7 @@
   "name": "cc-sub-usage",
   "version": "1.0.0",
   "description": "CLI to check Claude Code subscription usage",
+  "license": "MIT",
   "type": "module",
   "bin": {
     "cc-usage": "./dist/index.js"
