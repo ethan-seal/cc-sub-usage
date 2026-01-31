@@ -1,0 +1,23 @@
+{
+  "name": "cc-sub-usage",
+  "version": "1.0.0",
+  "description": "CLI to check Claude Code subscription usage",
+  "type": "module",
+  "bin": {
+    "cc-usage": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc && node dist/index.js"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0"
+  }
+}
